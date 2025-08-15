@@ -35,7 +35,8 @@ export const updateUserZodSchema = z.object({
     .min(2, { message: "Name at-least 2 character" })
     .max(20, { message: "Name can't exceed 20 character" })
     .optional(),
-  password: z
+
+  newPassword: z
     .string()
     .min(8, { message: "Password must be at least 8 character" })
     .regex(/[a-z]/, { message: "Must include a lowercase letter." })
@@ -45,18 +46,22 @@ export const updateUserZodSchema = z.object({
       message: "Must include a special character.",
     })
     .optional(),
+
+  oldPassword: z.string().optional(),
+
   phone: z
     .string()
     .regex(/^(?:\+88|88)?01[3-9]\d{8}$/, {
       message: "Please provide valid phone number",
     })
     .optional(),
+
   address: z
     .string({ message: "Address must be string" })
     .max(200, { message: "Address can not exceed 200 character." })
     .optional(),
+
   role: z.enum(Object.values(Role)).optional(),
-  isActive: z.enum(Object.values(IsActive)).optional(),
   isVerified: z.boolean().optional(),
   isDeleted: z.boolean().optional(),
 });

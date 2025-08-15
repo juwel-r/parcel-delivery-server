@@ -2,7 +2,9 @@ import { NextFunction, Request, Response } from "express";
 import { UserServices } from "./user.service";
 import { catchAsync } from "../../utils/catchAsync";
 import { sendResponse } from "../../utils/sendResponse";
-
+import { envVars } from "../../config/envConfig";
+import { JwtPayload } from "jsonwebtoken";
+import { verifyToken } from "../../utils/jwt/generateToken";
 
 const createUser = catchAsync(
   async (req: Request, res: Response, next: NextFunction) => {
@@ -29,8 +31,26 @@ const getAllUser = catchAsync(
     });
   }
 );
+const updateUser = catchAsync(
+  async (req: Request, res: Response, next: NextFunction) => {
+    const token = req.cookies.accessToken;
 
+    const decodedToken = verifyToken(
+      token,
+      envVars.JWT_ACCESS_SECRET
+    ) as JwtPayload;
+    const result = await UserServices.updateUser(req.body, decodedToken);
+
+    sendResponse(res, {
+      statusCode: 201,
+      success: true,
+      message: "Information Updated",
+      data: result,
+    });
+  }
+);
 export const UserController = {
   createUser,
   getAllUser,
+  updateUser,
 };

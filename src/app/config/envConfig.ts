@@ -7,7 +7,11 @@ interface EnvConfig {
   NODE_ENV: string;
   ADMIN_EMAIL: string;
   ADMIN_PASS: string;
-  BCRYPT_SALT_ROUND:string;
+  BCRYPT_SALT_ROUND: string;
+  JWT_ACCESS_SECRET: string;
+  JWT_ACCESS_EXPIRES: string;
+  JWT_REFRESH_SECRET: string;
+  JWT_REFRESH_EXPIRES: string;
 }
 
 const loadEnvVar = (): EnvConfig => {
@@ -17,7 +21,11 @@ const loadEnvVar = (): EnvConfig => {
     "NODE_ENV",
     "ADMIN_EMAIL",
     "ADMIN_PASS",
-    "BCRYPT_SALT_ROUND"
+    "BCRYPT_SALT_ROUND",
+    "JWT_ACCESS_SECRET",
+    "JWT_ACCESS_EXPIRES",
+    "JWT_REFRESH_SECRET",
+    "JWT_REFRESH_EXPIRES",
   ];
 
   requiredVars.forEach((key) => {
@@ -34,9 +42,13 @@ const loadEnvVar = (): EnvConfig => {
     PORT: envString("PORT"),
     DB_URL: envString("DB_URL"),
     NODE_ENV: envString("NODE_ENV"),
-    ADMIN_EMAIL:envString("ADMIN_EMAIL"),
-    ADMIN_PASS:envString("ADMIN_PASS"),
-    BCRYPT_SALT_ROUND:envString("BCRYPT_SALT_ROUND")
+    ADMIN_EMAIL: envString("ADMIN_EMAIL"),
+    ADMIN_PASS: envString("ADMIN_PASS"),
+    BCRYPT_SALT_ROUND: envString("BCRYPT_SALT_ROUND"),
+    JWT_ACCESS_SECRET: envString("JWT_ACCESS_SECRET"),
+    JWT_ACCESS_EXPIRES: envString("JWT_ACCESS_EXPIRES"),
+    JWT_REFRESH_SECRET: envString("JWT_REFRESH_SECRET"),
+    JWT_REFRESH_EXPIRES: envString("JWT_REFRESH_EXPIRES"),
   };
 };
 

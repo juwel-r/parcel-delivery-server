@@ -2,9 +2,11 @@ import express, { Request, Response } from "express";
 import { router } from "./app/router";
 import { globalError } from "./app/middlewares/globalErrorHandler";
 import { routeNotFound } from "./app/middlewares/routeNotFount";
+import cookieParser from 'cookie-parser'
 
 const app = express();
 app.use(express.json())
+app.use(cookieParser())
 
 app.use("/api/v1", router);
 
