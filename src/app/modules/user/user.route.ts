@@ -7,7 +7,7 @@ const router = Router();
 
 router.post(
   "/register",
-  // zodValidation(createUserZodSchema),
+  zodValidation(createUserZodSchema),
   UserController.createUser
 );
 
