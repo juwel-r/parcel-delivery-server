@@ -3,6 +3,7 @@ import {Server} from 'http'
 import mongoose from 'mongoose';
 import app from './app';
 import { envVars } from './app/config/envConfig';
+import { seedAdmin } from './app/utils/seedAdmin';
 
 let server:Server;
 
@@ -19,7 +20,14 @@ const main =async ()=>{
         
     }
 }
-main()
+
+try {
+  main()
+  seedAdmin()
+} catch (error) {
+  console.log(error);
+  process.exit(1)
+}
 
 
 process.on("uncaughtException", (error) => {
