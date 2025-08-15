@@ -16,8 +16,8 @@ const userSchema = new Schema<IUser>(
   {
     name: { type: String, require: true },
     email: { type: String, require: true, unique:true },
-    password: {type: String,minLength: [6, "Password must be at least 6 character."],},
-    phone: { type: String },
+    password: {type: String,minLength: [8, "Password must be at least 6 character."],},
+    // phone: { type: String },
     address: { type: String },
     role: { type: String, enum: Object.values(Role), default: Role.SENDER },
     isActive: {type: String,enum: Object.values(IsActive),default: IsActive.ACTIVE,},
