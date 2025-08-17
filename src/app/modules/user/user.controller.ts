@@ -1,10 +1,13 @@
+/* eslint-disable @typescript-eslint/no-non-null-assertion */
 import { NextFunction, Request, Response } from "express";
 import { UserServices } from "./user.service";
 import { catchAsync } from "../../utils/catchAsync";
 import { sendResponse } from "../../utils/sendResponse";
-import { envVars } from "../../config/envConfig";
-import { JwtPayload } from "jsonwebtoken";
-import { verifyToken } from "../../utils/jwt/generateToken";
+import { User } from "./user.model";
+import { IUser, Role } from "./user.interface";
+import { createTokens } from "../../utils/jwt/userTokens";
+import { setTokenToCookie } from "../../utils/jwt/setTokenToCookie";
+import AppError from "../../errorHelpers/AppError";
 
 const createUser = catchAsync(
   async (req: Request, res: Response, next: NextFunction) => {
@@ -31,15 +34,12 @@ const getAllUser = catchAsync(
     });
   }
 );
+
 const updateUser = catchAsync(
   async (req: Request, res: Response, next: NextFunction) => {
-    const token = req.cookies.accessToken;
+    const { id } = req.params;
 
-    const decodedToken = verifyToken(
-      token,
-      envVars.JWT_ACCESS_SECRET
-    ) as JwtPayload;
-    const result = await UserServices.updateUser(req.body, decodedToken);
+    const result = await UserServices.updateUser(id, req.body);
 
     sendResponse(res, {
       statusCode: 201,
@@ -49,8 +49,30 @@ const updateUser = catchAsync(
     });
   }
 );
+
+const swapRole = catchAsync(
+  async (req: Request, res: Response, next: NextFunction) => {
+    const {id} = req.params
+    const user = await User.findById(id);
+
+    const result = await UserServices.swapRole(user as IUser);
+    user!.role = result!.role
+
+    const userToken = createTokens(user as IUser);
+    setTokenToCookie(res,userToken)
+
+    sendResponse(res, {
+      statusCode: 201,
+      success: true,
+      message: result?.message as string,
+      data: null,
+    });
+  }
+);
+
 export const UserController = {
   createUser,
   getAllUser,
   updateUser,
+  swapRole,
 };

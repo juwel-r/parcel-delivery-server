@@ -1,10 +1,10 @@
+/* eslint-disable @typescript-eslint/no-non-null-assertion */
 import { User } from "./user.model";
-import { AuthProvider, IUser, Role } from "./user.interface";
+import { AuthProvider, IsActive, IUser, Role } from "./user.interface";
 import AppError from "../../errorHelpers/AppError";
 import httpStatus from "http-status-codes";
 import bcryptjs from "bcryptjs";
 import { envVars } from "../../config/envConfig";
-import { JwtPayload } from "jsonwebtoken";
 
 const createUser = async (payload: Partial<IUser>) => {
   const { email, password, ...rest } = payload;
@@ -41,17 +41,26 @@ const getAllUser = async () => {
   return result;
 };
 
-const updateUser = async (
-  payload: Partial<IUser>,
-  decodedToken: JwtPayload
-) => {
-  const user = await User.findById(decodedToken.userId);
+const updateUser = async (id: string, payload: Partial<IUser>) => {
+  const user = await User.findById(id);
+
+  if (!user) {
+    throw new AppError(404, "No user found to update.");
+  }
+
+  if (user!.isActive === IsActive.BLOCK || user!.isDeleted) {
+    throw new AppError(
+      httpStatus.FORBIDDEN,
+      "You are blocked or deleted user."
+    );
+  }
+
+  if (!user) {
+    throw new AppError(404, "User not found");
+  }
 
   if (payload.role) {
-    if (
-      decodedToken.role === Role.RECEIVER ||
-      decodedToken.role === Role.SENDER
-    ) {
+    if (user.role === Role.RECEIVER || user.role === Role.SENDER) {
       throw new AppError(
         httpStatus.FORBIDDEN,
         "You are not permitted to update Role"
@@ -61,7 +70,7 @@ const updateUser = async (
 
   if (
     (payload.isActive || payload.isDeleted || payload.isVerified) &&
-    decodedToken.role !== Role.ADMIN
+    user.role !== Role.ADMIN
   ) {
     throw new AppError(
       httpStatus.FORBIDDEN,
@@ -76,7 +85,6 @@ const updateUser = async (
     );
   }
 
-  // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
   const updateUser = await User.findByIdAndUpdate(user!._id, payload, {
     new: true,
     runValidators: true,
@@ -85,8 +93,29 @@ const updateUser = async (
   return updateUser;
 };
 
+const swapRole = async (user: IUser) => {
+  if (user.role === Role.RECEIVER) {
+    await User.findByIdAndUpdate(user._id, {
+      $set: { role: Role.SENDER },
+    });
+    return {
+      role: Role.SENDER,
+      message: "You are now a SENDER.",
+    };
+  } else if (user.role === Role.SENDER) {
+    await User.findByIdAndUpdate(user._id, {
+      $set: { role: Role.RECEIVER },
+    });
+    return {
+      role: Role.RECEIVER,
+      message: "You are now a RECEIVER.",
+    };
+  }
+};
+
 export const UserServices = {
   createUser,
   getAllUser,
   updateUser,
+  swapRole,
 };

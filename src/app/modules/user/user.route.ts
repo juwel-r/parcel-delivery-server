@@ -13,8 +13,11 @@ router.post(
   UserController.createUser
 );
 
-router.get("/all-user", UserController.getAllUser);
+router.get("/all-user",checkAuth(Role.ADMIN), UserController.getAllUser);
 
-router.patch("/:id",zodValidation(updateUserZodSchema), checkAuth(...Object.values(Role)), UserController.updateUser);
+router.patch('/swap-role/:id', checkAuth(Role.RECEIVER, Role.SENDER), UserController.swapRole)
+
+router.patch("/update/:id",zodValidation(updateUserZodSchema), checkAuth(...Object.values(Role)), UserController.updateUser);
+
 
 export const UserRoutes = router;

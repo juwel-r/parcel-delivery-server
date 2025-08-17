@@ -58,20 +58,13 @@ const logout = catchAsync(
 
 const resetPassword = catchAsync(
   async (req: Request, res: Response, next: NextFunction) => {
-    // const token = req.headers.authorization;
-    const token = req.cookies.accessToken;
+    
     const { newPassword, oldPassword } = req.body;
-
-    const verifiedToken = verifyToken(
-      // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
-      token!,
-      envVars.JWT_ACCESS_SECRET
-    ) as JwtPayload;
 
     await AuthService.resetPassword(
       oldPassword,
       newPassword,
-      verifiedToken.userId as string
+      req.user.userId as string
     );
 
     sendResponse(res, {

@@ -27,6 +27,7 @@ export const createUserZodSchema = z.object({
     .string({ message: "Address must be string" })
     .max(200, { message: "Address can not exceed 200 character." })
     .optional(),
+  role:z.enum([Role.RECEIVER,Role.SENDER])
 });
 
 export const updateUserZodSchema = z.object({
