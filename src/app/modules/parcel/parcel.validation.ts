@@ -15,6 +15,6 @@ export const updateStatusLog = z.object({
   status: z.enum(Object.values(ParcelStatus)),
   location: z.string(),
   notes: z.string().optional(),
-  updateBy:z.string(),
+  updatedBy:z.string(),
   timestamp: z.date().optional(),
 });

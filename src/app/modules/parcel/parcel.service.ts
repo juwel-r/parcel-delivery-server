@@ -42,18 +42,19 @@ const allParcel = async () => {
   return result;
 };
 
-const myParcel = async (id: string) => {
+const senderParcel = async (id: string) => {
   const result = await Parcel.find({ sender: id });
   return result;
 };
 
-const updateParcelStatus = async (id: string, payload: StatusLog) => {
-  const parcel = await Parcel.findById(id);
-  const updater = await User.findById(payload.updatedBy);
+const receiverParcel = async (id:string) =>{
+  const result = await Parcel.find({receiver:id});
 
-  if (!updater) {
-    throw new AppError(404, "No updater found.");
-  }
+  return result
+}
+
+const updateParcelStatus = async (parcelId: string, payload: StatusLog) => {
+  const parcel = await Parcel.findById(parcelId);
 
   if (!parcel) {
     throw new AppError(404, "No parcel found to update status.");
@@ -66,54 +67,144 @@ const updateParcelStatus = async (id: string, payload: StatusLog) => {
     );
   }
 
-  const errMessage = (updateable:string) => {
-    return `'Parcel current status is ${parcel.currentStatus}, so you can update into ${updateable}`;
+  const validationStatusUpdate: Record<ParcelStatus, ParcelStatus[]> = {
+    [ParcelStatus.REQUESTED]: [ParcelStatus.APPROVED, ParcelStatus.CANCELLED],
+    [ParcelStatus.APPROVED]: [ParcelStatus.DISPATCHED, ParcelStatus.CANCELLED],
+    [ParcelStatus.DISPATCHED]: [ParcelStatus.IN_TRANSIT],
+    [ParcelStatus.IN_TRANSIT]: [ParcelStatus.DELIVERED],
+    [ParcelStatus.CANCELLED]: [],
+    [ParcelStatus.DELIVERED]: [],
   };
 
-  //STATUS UPDATE ->
-  if (updater.role === Role.ADMIN) {
-
-    if (parcel.currentStatus === ParcelStatus.REQUESTED &&payload.status !== ParcelStatus.APPROVED) 
-      {throw new AppError(httStatus.BAD_REQUEST,errMessage("APPROVED"))}
-
-    if (parcel.currentStatus === ParcelStatus.APPROVED &&payload.status !== ParcelStatus.DISPATCHED) 
-      {throw new AppError(httStatus.BAD_REQUEST,errMessage("DISPATCHED"))}
-
-    if (parcel.currentStatus === ParcelStatus.DISPATCHED &&payload.status !== ParcelStatus.IN_TRANSIT) 
-      {throw new AppError(httStatus.BAD_REQUEST,errMessage("IN_TRANSIT"))}
-
-    if (parcel.currentStatus === ParcelStatus.IN_TRANSIT &&payload.status !== ParcelStatus.DELIVERED) 
-      {throw new AppError(httStatus.BAD_REQUEST,errMessage("DELIVERED"))}
-
-    const result = await Parcel.findByIdAndUpdate(id,
-      {$set: { currentStatus: payload.status },$push: { statusLog: payload }},
-      { new: true, runValidators: true }
-    );
-
-    return result;
+  if (parcel.currentStatus === ParcelStatus.CANCELLED ||
+      parcel.currentStatus === ParcelStatus.DELIVERED
+  ) {
+    throw new AppError(httStatus.BAD_REQUEST,`Parcel current status is ${parcel.currentStatus}, so  unable to update status.`)
   }
 
-  //CANCEL ->
-  if (payload.status === ParcelStatus.CANCELLED) {
-    if ((updater as IUser).role !== Role.ADMIN && !parcel.sender.equals(updater._id)) {
-      throw new AppError(httStatus.UNAUTHORIZED,"You are not allowed not CANCEL this parcel.");
-    }
-
-    const result = await Parcel.findByIdAndUpdate(id,
-      { $set: { currentStatus: payload.status }, $push: { statusLog: payload }},
-      { new: true, runValidators: true }
+  if (!validationStatusUpdate[parcel.currentStatus].includes(payload.status)) {
+    throw new AppError(
+      httStatus.BAD_REQUEST,
+      `'Parcel current status is ${
+        parcel.currentStatus
+      }, so you can update into '${
+        validationStatusUpdate[parcel.currentStatus]
+      }'`
     );
-
-    return result;
-  } 
-  else{
-    throw new AppError(httStatus.BAD_REQUEST,"You are not ADMIN or not owner of this parcel." )
   }
+
+  const result = await Parcel.findByIdAndUpdate(
+    parcelId,
+    { $set: { currentStatus: payload.status }, $push: { statusLog: payload } },
+    { new: true, runValidators: true }
+  );
+
+  return result;
+};
+
+const cancelParcel = async (parcelId: string, payload: StatusLog) => {
+  const parcel = await Parcel.findById(parcelId);
+
+  if (!parcel) {
+    throw new AppError(404, "No parcel found to update status.");
+  }
+
+  if (!parcel.sender.equals(payload.updatedBy)) {
+    throw new AppError(
+      httStatus.UNAUTHORIZED,
+      "You are not owner of this parcel."
+    );
+  }
+
+  if (parcel.isBlock) {
+    throw new AppError(
+      httStatus.BAD_REQUEST,
+      "This parcel is blocked, you can't update it's status."
+    );
+  }
+
+  if (payload.status !== ParcelStatus.CANCELLED) {
+    throw new AppError(
+      httStatus.BAD_REQUEST,
+      "You can only CANCEL your parcel from here"
+    );
+  }
+
+  if (
+    parcel.currentStatus !== ParcelStatus.REQUESTED &&
+    parcel.currentStatus !== ParcelStatus.APPROVED
+  ) {
+    throw new AppError(
+      httStatus.BAD_REQUEST,
+      "You can cancel a parcel only before DISPATCHED."
+    );
+  }
+
+  const result = await Parcel.findByIdAndUpdate(
+    parcelId,
+    {
+      $set: { currentStatus: payload.status },
+      $push: { statusLog: payload },
+    },
+    { new: true, runValidators: true }
+  );
+
+  return result;
+};
+
+const deliveredParcel = async (parcelId: string, payload: StatusLog) => {
+  const parcel = await Parcel.findById(parcelId);
+
+  if (!parcel) {
+    throw new AppError(404, "No parcel found to update status.");
+  }
+
+  if (!parcel.receiver.equals(payload.updatedBy)) {
+    throw new AppError(
+      httStatus.UNAUTHORIZED,
+      "You are not receiver of this parcel."
+    );
+  }
+
+  if (parcel.isBlock) {
+    throw new AppError(
+      httStatus.BAD_REQUEST,
+      "This parcel is blocked, you can't update it's status."
+    );
+  }
+
+  if (payload.status !== ParcelStatus.DELIVERED) {
+    throw new AppError(
+      httStatus.BAD_REQUEST,
+      "You can only update status as DELIVERED"
+    );
+  }
+
+  if (parcel.currentStatus !== ParcelStatus.IN_TRANSIT) {
+    throw new AppError(
+      httStatus.BAD_REQUEST,
+      "You can update status as DELIVERED only after IN_TRANSIT"
+    );
+  }
+
+  const result = await Parcel.findByIdAndUpdate(
+    parcelId,
+    {
+      $set: { currentStatus: payload.status },
+      $push: { statusLog: payload },
+    },
+    { new: true, runValidators: true }
+  );
+
+  return result;
 };
 
 export const ParcelService = {
   createParcel,
   allParcel,
-  myParcel,
+  senderParcel,
+  receiverParcel,
   updateParcelStatus,
+  cancelParcel,
+  deliveredParcel,
 };

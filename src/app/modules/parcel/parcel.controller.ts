@@ -33,12 +33,11 @@ const allParcel = catchAsync(
   }
 );
 
-
-const myParcel = catchAsync(
+const senderParcel = catchAsync(
   async (req: Request, res: Response, Next: NextFunction) => {
 
     const {id} = req.params
-    const result = await ParcelService.myParcel(id);
+    const result = await ParcelService.senderParcel(id);
 
     sendResponse(res, {
       success: true,
@@ -48,6 +47,22 @@ const myParcel = catchAsync(
     });
   }
 );
+
+const receiverParcel = catchAsync(
+  async (req: Request, res: Response, Next: NextFunction) => {
+
+    const {id} = req.params
+    const result = await ParcelService.receiverParcel(id);
+
+    sendResponse(res, {
+      success: true,
+      statusCode: httpStatus.CREATED,
+      message: "All of receiver parcels retrieved successfully",
+      data: result,
+    });
+  }
+);
+
 
 const updateParcelStatus = catchAsync(
   async (req: Request, res: Response, Next: NextFunction) => {
@@ -64,10 +79,45 @@ const updateParcelStatus = catchAsync(
   }
 );
 
+const cancelParcel = catchAsync(
+  async (req: Request, res: Response, Next: NextFunction) => {
+    const {id} = req.params;
+
+    const result = await ParcelService.cancelParcel(id, req.body)
+
+    sendResponse(res, {
+      success: true,
+      statusCode: httpStatus.CREATED,
+      message: "Parcel has been CANCELLED",
+      data: result,
+    });
+  }
+);
+
+const deliveredParcel = catchAsync(
+  async (req: Request, res: Response, Next: NextFunction) => {
+    const {id} = req.params;
+
+    const result = await ParcelService.deliveredParcel(id, req.body)
+
+    sendResponse(res, {
+      success: true,
+      statusCode: httpStatus.CREATED,
+      message: "Parcel has been DELIVERED",
+      data: result,
+    });
+  }
+);
+
+
+
 
 export const ParcelController = {
     createParcel,
     allParcel,
-    myParcel,
-    updateParcelStatus
+    senderParcel,
+    receiverParcel,
+    updateParcelStatus,
+    cancelParcel,
+    deliveredParcel
 }
