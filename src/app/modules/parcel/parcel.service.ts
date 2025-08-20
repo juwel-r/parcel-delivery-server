@@ -3,31 +3,57 @@ import { trackingId } from "../../utils/trackingId";
 import { IParcel, ParcelStatus, StatusLog } from "./parcel.interface";
 import { calculateParcelFee } from "../../utils/calculateParcelFee";
 import { Parcel } from "./parcel.model";
-import { IUser, Role } from "../user/user.interface";
+import { Role } from "../user/user.interface";
 import AppError from "../../errorHelpers/AppError";
 import httStatus from "http-status-codes";
-import { JwtPayload } from "jsonwebtoken";
 import { User } from "../user/user.model";
+import { searchableFields } from "./parcel.constant";
+import { excludeFields } from "../../utils/global.constant";
+import { QueryBuilder } from "../../utils/queryBuilder";
 
 const createParcel = async (req: Request) => {
   const payload: Partial<IParcel> = req.body;
-  const user = req.user;
+  const user = await User.findById(req.user.userId);
+
+  if (!user) {
+    throw new AppError(404, "Sender is not exist.");
+  }
+
+  if (!user.phone || !user.address) {
+    throw new AppError(
+      httStatus.FORBIDDEN,
+      "Please update phone number and address to create parcel"
+    );
+  }
 
   if (user.role === Role.RECEIVER) {
     throw new AppError(
       httStatus.UNAUTHORIZED,
-      "Your are a RECEIVER, You are not permitted to send a parcel. Be a SENDER to send parcel"
+      "Your are a RECEIVER, please swap your role to SENDER to create parcel."
+    );
+  }
+
+  const isReceiverExist = await User.findById(payload.receiver);
+
+  if (!isReceiverExist) {
+    throw new AppError(404, "Receiver is not exist.");
+  }
+
+  if (isReceiverExist.role !== Role.RECEIVER) {
+    throw new AppError(
+      400,
+      `Parcel Receiver's current role is ${isReceiverExist.role}, please contact with him to swap his role.`
     );
   }
 
   const statusLog: StatusLog = {
     status: ParcelStatus.REQUESTED,
     location: payload.pickupAddress as string,
-    updatedBy: user.userId,
+    updatedBy: req.user.userId,
   };
 
   payload.trackingId = trackingId();
-  payload.sender = user.userId;
+  payload.sender = req.user.userId;
   payload.fee = calculateParcelFee(Number(payload.weight));
   payload.statusLog = [statusLog];
 
@@ -36,25 +62,118 @@ const createParcel = async (req: Request) => {
   return parcel;
 };
 
-const allParcel = async () => {
-  const result = await Parcel.find({});
+const getAllParcel = async (query: Record<string, string>) => {
+  const queryBuilder = new QueryBuilder(Parcel.find(), query);
+
+  const result = await queryBuilder
+    .filter()
+    .search(searchableFields)
+    .fields()
+    .sort()
+    .build();
 
   return result;
 };
 
-const senderParcel = async (id: string) => {
-  const result = await Parcel.find({ sender: id });
+const getSingleParcel = async (id: string) => {
+  const result = await Parcel.findById(id);
+
   return result;
 };
 
-const receiverParcel = async (id:string) =>{
-  const result = await Parcel.find({receiver:id});
+const senderAllParcel = async (id: string, query:Record<string, string>) => {
+  const isSenderExist = await User.findById(id);
 
-  return result
-}
+  if (!isSenderExist) {
+    throw new AppError(httStatus.NOT_FOUND, "Parcel sender is not exist.");
+  }
+  const queryBuilder = new QueryBuilder(Parcel.find(), query);
+
+  const result = await queryBuilder
+    .filter()
+    .search(searchableFields)
+    .fields()
+    .sort()
+    .build();
+
+  return result;
+};
+
+const receiverAllParcel = async (id: string, query:Record<string, string>) => {
+  const isReceiverExist = await User.findById(id);
+
+  if (!isReceiverExist) {
+    throw new AppError(httStatus.NOT_FOUND, "Receiver is not exist.");
+  }
+  const queryBuilder = new QueryBuilder(Parcel.find(), query);
+
+  const result = await queryBuilder
+    .filter()
+    .search(searchableFields)
+    .fields()
+    .sort()
+    .build();
+
+  return result;
+};
+
+const receiverDeliveredParcel = async (id: string) => {
+  const isReceiverExist = await User.findById(id);
+
+  if (!isReceiverExist) {
+    throw new AppError(httStatus.NOT_FOUND, "Receiver is not exist.");
+  }
+
+  const result = await Parcel.find({
+    receiver: id,
+    currentStatus: { $eq: ParcelStatus.DELIVERED },
+  });
+
+  return result;
+};
+
+const receiverUpcomingParcel = async (id: string) => {
+  const isReceiverExist = await User.findById(id);
+
+  if (!isReceiverExist) {
+    throw new AppError(httStatus.NOT_FOUND, "Receiver is not exist.");
+  }
+
+  const result = await Parcel.find({
+    receiver: id,
+    currentStatus: { $nin: [ParcelStatus.DELIVERED, ParcelStatus.CANCELLED] },
+  });
+
+  return result;
+};
+
+const deliveryHistory = async (trackingId: string) => {
+  const parcel = await Parcel.findOne({ trackingId })
+    .select(
+      "-weight -isBlock -createdAt -updatedAt -fee -details -pickupAddress"
+    )
+    .populate("sender", "name phone")
+    .populate("receiver", "name phone");
+
+  if (!parcel) {
+    throw new AppError(404, "Parcel not found with your tracking id.");
+  }
+
+  return parcel;
+};
 
 const updateParcelStatus = async (parcelId: string, payload: StatusLog) => {
   const parcel = await Parcel.findById(parcelId);
+
+  const updater = await User.findById(payload.updatedBy);
+
+  if (!updater) {
+    throw new AppError(404, "Updater is not exist.");
+  }
+
+  if (!parcel) {
+    throw new AppError(404, "No parcel found to update status.");
+  }
 
   if (!parcel) {
     throw new AppError(404, "No parcel found to update status.");
@@ -76,10 +195,14 @@ const updateParcelStatus = async (parcelId: string, payload: StatusLog) => {
     [ParcelStatus.DELIVERED]: [],
   };
 
-  if (parcel.currentStatus === ParcelStatus.CANCELLED ||
-      parcel.currentStatus === ParcelStatus.DELIVERED
+  if (
+    parcel.currentStatus === ParcelStatus.CANCELLED ||
+    parcel.currentStatus === ParcelStatus.DELIVERED
   ) {
-    throw new AppError(httStatus.BAD_REQUEST,`Parcel current status is ${parcel.currentStatus}, so  unable to update status.`)
+    throw new AppError(
+      httStatus.BAD_REQUEST,
+      `Parcel current status is ${parcel.currentStatus}, so  unable to update status.`
+    );
   }
 
   if (!validationStatusUpdate[parcel.currentStatus].includes(payload.status)) {
@@ -152,7 +275,7 @@ const cancelParcel = async (parcelId: string, payload: StatusLog) => {
   return result;
 };
 
-const deliveredParcel = async (parcelId: string, payload: StatusLog) => {
+const deliverParcel = async (parcelId: string, payload: StatusLog) => {
   const parcel = await Parcel.findById(parcelId);
 
   if (!parcel) {
@@ -199,12 +322,35 @@ const deliveredParcel = async (parcelId: string, payload: StatusLog) => {
   return result;
 };
 
+const blockParcel = async (parcelId: string) => {
+  const parcel = await Parcel.findById(parcelId);
+
+  if (!parcel) {
+    throw new AppError(404, "No parcel found to block.");
+  }
+
+  const result = await Parcel.findByIdAndUpdate(
+    parcelId,
+    {
+      $set: { isBlock: !parcel.isBlock },
+    },
+    { new: true }
+  );
+
+  return result;
+};
+
 export const ParcelService = {
   createParcel,
-  allParcel,
-  senderParcel,
-  receiverParcel,
+  getAllParcel,
+  senderAllParcel,
+  receiverAllParcel,
+  receiverDeliveredParcel,
   updateParcelStatus,
   cancelParcel,
-  deliveredParcel,
+  deliverParcel,
+  deliveryHistory,
+  blockParcel,
+  getSingleParcel,
+  receiverUpcomingParcel,
 };

@@ -22,6 +22,7 @@ const parcelSchema = new Schema<IParcel>({
   details:{ type: String},
   weight: { type: Number, default: 0 },
   fee: { type: Number, required: true },
+  deliveryDate: { type: String, required: true },
   currentStatus: {type: String,enum: Object.values(ParcelStatus),default: ParcelStatus.REQUESTED},
   statusLog: [statusLogSchema],
   isBlock: { type: Boolean, default: false },

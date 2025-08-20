@@ -6,7 +6,6 @@ import httpStatus from "http-status-codes";
 
 const createParcel = catchAsync(
   async (req: Request, res: Response, Next: NextFunction) => {
-
     const result = await ParcelService.createParcel(req);
 
     sendResponse(res, {
@@ -18,57 +17,98 @@ const createParcel = catchAsync(
   }
 );
 
-
-const allParcel = catchAsync(
+const getAllParcel = catchAsync(
   async (req: Request, res: Response, Next: NextFunction) => {
+    const query = req.query;
+    
 
-    const result = await ParcelService.allParcel();
+    const result = await ParcelService.getAllParcel(query as Record<string,string>);
 
     sendResponse(res, {
       success: true,
-      statusCode: httpStatus.CREATED,
+      statusCode: httpStatus.OK,
       message: "All parcels retrieved successfully",
       data: result,
     });
   }
 );
 
-const senderParcel = catchAsync(
+const getSingleParcel = catchAsync(
   async (req: Request, res: Response, Next: NextFunction) => {
-
     const {id} = req.params
-    const result = await ParcelService.senderParcel(id);
+
+    const result = await ParcelService.getSingleParcel(id);
 
     sendResponse(res, {
       success: true,
-      statusCode: httpStatus.CREATED,
+      statusCode: httpStatus.OK,
+      message: "All parcels retrieved successfully",
+      data: result,
+    });
+  }
+);
+
+const senderAllParcel = catchAsync(
+  async (req: Request, res: Response, Next: NextFunction) => {
+    const { id } = req.params;
+    const result = await ParcelService.senderAllParcel(id, req.query as Record<string,string>);
+
+    sendResponse(res, {
+      success: true,
+      statusCode: httpStatus.OK,
       message: "All of your parcels retrieved successfully",
       data: result,
     });
   }
 );
 
-const receiverParcel = catchAsync(
+const receiverAllParcel = catchAsync(
   async (req: Request, res: Response, Next: NextFunction) => {
-
-    const {id} = req.params
-    const result = await ParcelService.receiverParcel(id);
+    const { id } = req.params;
+    const result = await ParcelService.receiverAllParcel(id, req.query as Record<string,string>);
 
     sendResponse(res, {
       success: true,
-      statusCode: httpStatus.CREATED,
+      statusCode: httpStatus.OK,
       message: "All of receiver parcels retrieved successfully",
       data: result,
     });
   }
 );
 
+const receiverDeliveredParcel = catchAsync(
+  async (req: Request, res: Response, Next: NextFunction) => {
+    const { id } = req.params;
+    const result = await ParcelService.receiverDeliveredParcel(id);
+
+    sendResponse(res, {
+      success: true,
+      statusCode: httpStatus.OK,
+      message: "All of receiver parcels retrieved successfully",
+      data: result,
+    });
+  }
+);
+
+const receiverUpcomingParcel = catchAsync(
+  async (req: Request, res: Response, Next: NextFunction) => {
+    const { id } = req.params;
+    const result = await ParcelService.receiverUpcomingParcel(id);
+
+    sendResponse(res, {
+      success: true,
+      statusCode: httpStatus.OK,
+      message: "All of receiver parcels retrieved successfully",
+      data: result,
+    });
+  }
+);
 
 const updateParcelStatus = catchAsync(
   async (req: Request, res: Response, Next: NextFunction) => {
-    const {id} = req.params;
+    const { id } = req.params;
 
-    const result = await ParcelService.updateParcelStatus(id, req.body)
+    const result = await ParcelService.updateParcelStatus(id, req.body);
 
     sendResponse(res, {
       success: true,
@@ -81,9 +121,9 @@ const updateParcelStatus = catchAsync(
 
 const cancelParcel = catchAsync(
   async (req: Request, res: Response, Next: NextFunction) => {
-    const {id} = req.params;
+    const { id } = req.params;
 
-    const result = await ParcelService.cancelParcel(id, req.body)
+    const result = await ParcelService.cancelParcel(id, req.body);
 
     sendResponse(res, {
       success: true,
@@ -94,11 +134,11 @@ const cancelParcel = catchAsync(
   }
 );
 
-const deliveredParcel = catchAsync(
+const deliverParcel = catchAsync(
   async (req: Request, res: Response, Next: NextFunction) => {
-    const {id} = req.params;
+    const { id } = req.params;
 
-    const result = await ParcelService.deliveredParcel(id, req.body)
+    const result = await ParcelService.deliverParcel(id, req.body);
 
     sendResponse(res, {
       success: true,
@@ -109,15 +149,47 @@ const deliveredParcel = catchAsync(
   }
 );
 
+const deliveryHistory = catchAsync(
+  async (req: Request, res: Response, Next: NextFunction) => {
+    const { trackingId } = req.params;
 
+    const result = await ParcelService.deliveryHistory(trackingId);
 
+    sendResponse(res, {
+      success: true,
+      statusCode: httpStatus.OK,
+      message: "Parcel history showing",
+      data: result,
+    });
+  }
+);
+
+const blockParcel = catchAsync(
+  async (req: Request, res: Response, Next: NextFunction) => {
+    const { id } = req.params;
+
+    const result = await ParcelService.blockParcel(id);
+
+    sendResponse(res, {
+      success: true,
+      statusCode: httpStatus.CREATED,
+      message: `Parcel has been ${result?.isBlock ?"Blocked":"Unblocked"}`,
+      data: null,
+    });
+  }
+);
 
 export const ParcelController = {
-    createParcel,
-    allParcel,
-    senderParcel,
-    receiverParcel,
-    updateParcelStatus,
-    cancelParcel,
-    deliveredParcel
-}
+  createParcel,
+  getAllParcel,
+  senderAllParcel,
+  receiverAllParcel,
+  receiverDeliveredParcel,
+  receiverUpcomingParcel,
+  updateParcelStatus,
+  cancelParcel,
+  deliverParcel,
+  deliveryHistory,
+  blockParcel,
+  getSingleParcel,
+};

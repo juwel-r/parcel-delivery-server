@@ -53,7 +53,7 @@ export const updateUserZodSchema = z.object({
   phone: z
     .string()
     .regex(/^(?:\+88|88)?01[3-9]\d{8}$/, {
-      message: "Please provide valid phone number",
+      message: "Please provide a valid phone number",
     })
     .optional(),
 
@@ -63,6 +63,6 @@ export const updateUserZodSchema = z.object({
     .optional(),
 
   role: z.enum(Object.values(Role)).optional(),
+  isActive:z.enum(Object.values(IsActive)).optional(),
   isVerified: z.boolean().optional(),
-  isDeleted: z.boolean().optional(),
 });

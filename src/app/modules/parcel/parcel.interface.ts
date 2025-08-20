@@ -27,6 +27,7 @@ export interface IParcel {
   details:string;
   weight?: number;
   fee: number;
+  deliveryDate:string;
   currentStatus: ParcelStatus;
   statusLog: StatusLog[];
   isBlock: boolean;

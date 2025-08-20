@@ -9,11 +9,7 @@ const router = Router();
 
 router.post("/login", AuthController.credentialLogin);
 
-router.post(
-  "/refresh-token",
-  checkAuth(...Object.values(Role)),
-  AuthController.refreshToken
-);
+router.post("/refresh-token", AuthController.refreshToken);
 
 router.post("/logout", AuthController.logout);
 

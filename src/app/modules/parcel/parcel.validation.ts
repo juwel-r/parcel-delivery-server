@@ -8,6 +8,7 @@ export const parcelZodSchema = z.object({
   type: z.string(),
   details: z.string().optional(),
   weight: z.number().optional(),
+  deliveryDate:z.string(),
   currentStatus: z.enum(Object.values(ParcelStatus)),
 });
 
@@ -16,5 +17,4 @@ export const updateStatusLog = z.object({
   location: z.string(),
   notes: z.string().optional(),
   updatedBy:z.string(),
-  timestamp: z.date().optional(),
 });
