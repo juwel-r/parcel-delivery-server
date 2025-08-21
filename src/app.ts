@@ -21,3 +21,9 @@ app.use(globalError);
 app.use(routeNotFound);
 
 export default app;
+
+/**
+ * 
+ * Will you allow search/filter by status or delivery time?
+ * Can admins access all records with filters?
+ */

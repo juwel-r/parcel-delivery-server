@@ -15,12 +15,19 @@ const authProviderSchema = new Schema<AuthProvider>(
 const userSchema = new Schema<IUser>(
   {
     name: { type: String, require: true },
-    email: { type: String, require: true, unique:true },
-    password: {type: String,minLength: [8, "Password must be at least 6 character."],},
-    // phone: { type: String },
+    email: { type: String, require: true, unique: true },
+    password: {
+      type: String,
+      minLength: [8, "Password must be at least 6 character."],
+    },
+    phone: { type: String, unique: true, sparse: true },
     address: { type: String },
     role: { type: String, enum: Object.values(Role), default: Role.SENDER },
-    isActive: {type: String,enum: Object.values(IsActive),default: IsActive.ACTIVE,},
+    isActive: {
+      type: String,
+      enum: Object.values(IsActive),
+      default: IsActive.ACTIVE,
+    },
     isVerified: { type: Boolean, default: false },
     isDeleted: { type: Boolean, default: false },
     authProvider: [authProviderSchema],

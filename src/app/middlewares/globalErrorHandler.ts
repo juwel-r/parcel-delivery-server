@@ -39,6 +39,7 @@ if(envVars.NODE_ENV === "development" ? error.stack : null){
 
   res.status(statusCode).json({
     success: false,
+    statusCode:statusCode,
     message: message,
     error:envVars.NODE_ENV === "development" ? error : null,
     stack: envVars.NODE_ENV === "development" ? error.stack : null,

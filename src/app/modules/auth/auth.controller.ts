@@ -5,9 +5,7 @@ import httpStatus from "http-status-codes";
 import { sendResponse } from "../../utils/sendResponse";
 import { setTokenToCookie } from "../../utils/jwt/setTokenToCookie";
 import AppError from "../../errorHelpers/AppError";
-import { verifyToken } from "../../utils/jwt/generateToken";
-import { envVars } from "../../config/envConfig";
-import { JwtPayload } from "jsonwebtoken";
+
 
 const credentialLogin = catchAsync(
   async (req: Request, res: Response, next: NextFunction) => {
@@ -34,10 +32,12 @@ const refreshToken = catchAsync(
     }
 
     const newAccessToken = await AuthService.getNewAccessToken(refreshToken);
+    setTokenToCookie (res, newAccessToken);
+
     sendResponse(res, {
       success: true,
       statusCode: httpStatus.CREATED,
-      message: "User tokens generated.",
+      message: "New User tokens generated.",
       data: newAccessToken,
     });
   }
@@ -58,20 +58,13 @@ const logout = catchAsync(
 
 const resetPassword = catchAsync(
   async (req: Request, res: Response, next: NextFunction) => {
-    // const token = req.headers.authorization;
-    const token = req.cookies.accessToken;
+    
     const { newPassword, oldPassword } = req.body;
-
-    const verifiedToken = verifyToken(
-      // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
-      token!,
-      envVars.JWT_ACCESS_SECRET
-    ) as JwtPayload;
 
     await AuthService.resetPassword(
       oldPassword,
       newPassword,
-      verifiedToken.userId as string
+      req.user.userId as string
     );
 
     sendResponse(res, {

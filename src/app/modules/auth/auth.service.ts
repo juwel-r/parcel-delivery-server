@@ -63,7 +63,6 @@ const resetPassword = async (oldPassword:string, newPassword:string, userId:stri
   user!.password = newHashPass
   user!.save()
 
-
 }
 
 export const AuthService = {

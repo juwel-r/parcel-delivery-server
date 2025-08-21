@@ -2,7 +2,7 @@ import { Response } from "express";
 
 interface IToken {
   accessToken: string;
-  refreshToken: string;
+  refreshToken?: string;
 }
 
 export const setTokenToCookie = (res: Response, token: IToken) => {

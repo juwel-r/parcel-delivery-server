@@ -12,6 +12,7 @@ interface EnvConfig {
   JWT_ACCESS_EXPIRES: string;
   JWT_REFRESH_SECRET: string;
   JWT_REFRESH_EXPIRES: string;
+  DB_URL_LIVE:string;
 }
 
 const loadEnvVar = (): EnvConfig => {
@@ -26,6 +27,7 @@ const loadEnvVar = (): EnvConfig => {
     "JWT_ACCESS_EXPIRES",
     "JWT_REFRESH_SECRET",
     "JWT_REFRESH_EXPIRES",
+    "DB_URL_LIVE",
   ];
 
   requiredVars.forEach((key) => {
@@ -49,6 +51,7 @@ const loadEnvVar = (): EnvConfig => {
     JWT_ACCESS_EXPIRES: envString("JWT_ACCESS_EXPIRES"),
     JWT_REFRESH_SECRET: envString("JWT_REFRESH_SECRET"),
     JWT_REFRESH_EXPIRES: envString("JWT_REFRESH_EXPIRES"),
+    DB_URL_LIVE:envString("DB_URL_LIVE")
   };
 };
 
