@@ -1,0 +1,760 @@
+{
+	"info": {
+		"_postman_id": "aa9e1bdb-4b92-4d2e-9c3e-767dcc301166",
+		"name": "Parcel Delivery",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+		"_exporter_id": "45537691",
+		"_collection_link": "https://juwelrana-360891.postman.co/workspace/d4717b01-550a-4ddc-8eec-022f175a7318/collection/45537691-aa9e1bdb-4b92-4d2e-9c3e-767dcc301166?action=share&source=collection_link&creator=45537691"
+	},
+	"item": [
+		{
+			"name": "User",
+			"item": [
+				{
+					"name": "User Register",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOiI2ODk5MDMyMjA4ZjQ0MTBmYTQ5NjY1YWUiLCJlbWFpbCI6InN1cGVyQGVtYWlsLmNvbSIsInJvbGUiOiJTVVBFUl9BRE1JTiIsImlhdCI6MTc1NTA2ODUzMywiZXhwIjoxNzU1MTU0OTMzfQ.a1X0eZHpJeGGtMzZueTd7T5YbHhG5UJNo8pswFuyhmY",
+								"type": "text"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n    \"name\":\"Sumon Islam\",\r\n    \"email\":\"sumon45@gmail.com\",\r\n    \"password\":\"aA!123456\",\r\n    \"role\":\"RECEIVER\"\r\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{baseUrl}}/api/v1/user/register",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"api",
+								"v1",
+								"user",
+								"register"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Update user",
+					"request": {
+						"method": "PATCH",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOiI2ODk5MDMyMjA4ZjQ0MTBmYTQ5NjY1YWUiLCJlbWFpbCI6InN1cGVyQGVtYWlsLmNvbSIsInJvbGUiOiJTVVBFUl9BRE1JTiIsImlhdCI6MTc1NTA2ODUzMywiZXhwIjoxNzU1MTU0OTMzfQ.a1X0eZHpJeGGtMzZueTd7T5YbHhG5UJNo8pswFuyhmY",
+								"type": "text"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n    // \"name\":\"System Admin\",\r\n    // \"email\":\"juwel123@gmail.com\",\r\n    // \"phone\":\"01788285626\",\r\n    // \"address\":\"Rajshahi\"\r\n    \"isActive\":\"ACTIVE\"\r\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{baseUrl}}/api/v1/user/68a6428643d7d82cff978018",
+							
+							"host": [
+								"{{baseUrl}}"
+							],
+							
+							"path": [
+								"api",
+								"v1",
+								"user",
+								"68a6428643d7d82cff978018"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Swap Role",
+					"request": {
+						"method": "PATCH",
+						"header": [],
+						"url": {
+							"raw": "{{baseUrl}}/api/v1/user/68a694a5b5cf4fd7b8e623c5/role",
+							
+							"host": [
+								"{{baseUrl}}"
+							],
+							
+							"path": [
+								"api",
+								"v1",
+								"user",
+								"68a694a5b5cf4fd7b8e623c5",
+								"role"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Get All User",
+					"protocolProfileBehavior": {
+						"disableBodyPruning": true
+					},
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOiI2ODk5MDMyMjA4ZjQ0MTBmYTQ5NjY1YWUiLCJlbWFpbCI6InN1cGVyQGVtYWlsLmNvbSIsInJvbGUiOiJTVVBFUl9BRE1JTiIsImlhdCI6MTc1NTA2ODUzMywiZXhwIjoxNzU1MTU0OTMzfQ.a1X0eZHpJeGGtMzZueTd7T5YbHhG5UJNo8pswFuyhmY",
+								"type": "text"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n    \"name\":\"Juwel\",\r\n    \"email\":\"judswel1@gmail.com\"\r\n}"
+						},
+						"url": {
+							"raw": "{{baseUrl}}/api/v1/user?fields=name,email,role,address&searchTerm=hakim",
+							
+							"host": [
+								"{{baseUrl}}"
+							],
+							
+							"path": [
+								"api",
+								"v1",
+								"user"
+							],
+							"query": [
+								{
+									"key": "fields",
+									"value": "name,email,role,address"
+								},
+								{
+									"key": "searchTerm",
+									"value": "hakim"
+								},
+								{
+									"key": "role",
+									"value": "SENDER",
+									"disabled": true
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Get Single User",
+					"protocolProfileBehavior": {
+						"disableBodyPruning": true
+					},
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOiI2ODk5MDMyMjA4ZjQ0MTBmYTQ5NjY1YWUiLCJlbWFpbCI6InN1cGVyQGVtYWlsLmNvbSIsInJvbGUiOiJTVVBFUl9BRE1JTiIsImlhdCI6MTc1NTA2ODUzMywiZXhwIjoxNzU1MTU0OTMzfQ.a1X0eZHpJeGGtMzZueTd7T5YbHhG5UJNo8pswFuyhmY",
+								"type": "text"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n    \"name\":\"Juwel\",\r\n    \"email\":\"judswel1@gmail.com\"\r\n}"
+						},
+						"url": {
+							"raw": "{{baseUrl}}/api/v1/user/68a4747e4a3a04584de564c0",
+							
+							"host": [
+								"{{baseUrl}}"
+							],
+							
+							"path": [
+								"api",
+								"v1",
+								"user",
+								"68a4747e4a3a04584de564c0"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Delete User",
+					"request": {
+						"method": "DELETE",
+						"header": [],
+						"url": {
+							"raw": "{{baseUrl}}/api/v1/user/68a4747e4a3a04584de564c0",
+							
+							"host": [
+								"{{baseUrl}}"
+							],
+							
+							"path": [
+								"api",
+								"v1",
+								"user",
+								"68a4747e4a3a04584de564c0"
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "Auth",
+			"item": [
+				{
+					"name": "Login",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOiI2ODk5MDMyMjA4ZjQ0MTBmYTQ5NjY1YWUiLCJlbWFpbCI6InN1cGVyQGVtYWlsLmNvbSIsInJvbGUiOiJTVVBFUl9BRE1JTiIsImlhdCI6MTc1NTA2ODUzMywiZXhwIjoxNzU1MTU0OTMzfQ.a1X0eZHpJeGGtMzZueTd7T5YbHhG5UJNo8pswFuyhmY",
+								"type": "text"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n    \"email\":\"system-admin@gmail.com\",\r\n    \"password\":\"123456@\" \r\n    // \"email\":\"sumon45@gmail.com\",\r\n    // \"password\":\"aA!123456\"\r\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{baseUrl}}/api/v1/auth/login",
+							
+							"host": [
+								"{{baseUrl}}"
+							],
+							
+							"path": [
+								"api",
+								"v1",
+								"auth",
+								"login"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Logout",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOiI2ODk5MDMyMjA4ZjQ0MTBmYTQ5NjY1YWUiLCJlbWFpbCI6InN1cGVyQGVtYWlsLmNvbSIsInJvbGUiOiJTVVBFUl9BRE1JTiIsImlhdCI6MTc1NTA2ODUzMywiZXhwIjoxNzU1MTU0OTMzfQ.a1X0eZHpJeGGtMzZueTd7T5YbHhG5UJNo8pswFuyhmY",
+								"type": "text"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{baseUrl}}/api/v1/auth/logout",
+							
+							"host": [
+								"{{baseUrl}}"
+							],
+							
+							"path": [
+								"api",
+								"v1",
+								"auth",
+								"logout"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Refresh Token",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOiI2ODk5MDMyMjA4ZjQ0MTBmYTQ5NjY1YWUiLCJlbWFpbCI6InN1cGVyQGVtYWlsLmNvbSIsInJvbGUiOiJTVVBFUl9BRE1JTiIsImlhdCI6MTc1NTA2ODUzMywiZXhwIjoxNzU1MTU0OTMzfQ.a1X0eZHpJeGGtMzZueTd7T5YbHhG5UJNo8pswFuyhmY",
+								"type": "text"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{baseUrl}}/api/v1/auth/refresh-token",
+							
+							"host": [
+								"{{baseUrl}}"
+							],
+							
+							"path": [
+								"api",
+								"v1",
+								"auth",
+								"refresh-token"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Reset Password",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOiI2ODlmYTg1NTgyMzMwMjViZmUxMDkxNmQiLCJlbWFpbCI6InN5c3RlbS1hZG1pbkBnbWFpbC5jb20iLCJyb2xlIjoiQURNSU4iLCJpYXQiOjE3NTUyOTU1MDYsImV4cCI6MTc1NjE1OTUwNn0.lMPmevdqnTmuBHfbMr_n8mTG6-A1l33TrxjgyKTLMgk",
+								"type": "text"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n    \"newPassword\": \"aA!123456\",\r\n    \"oldPassword\": \"aA!12345\"\r\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{baseUrl}}/api/v1/auth/reset-password",
+							
+							"host": [
+								"{{baseUrl}}"
+							],
+							
+							"path": [
+								"api",
+								"v1",
+								"auth",
+								"reset-password"
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "Parcel",
+			"item": [
+				{
+					"name": "Create Parcel",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOiI2ODk5MDMyMjA4ZjQ0MTBmYTQ5NjY1YWUiLCJlbWFpbCI6InN1cGVyQGVtYWlsLmNvbSIsInJvbGUiOiJTVVBFUl9BRE1JTiIsImlhdCI6MTc1NTA2ODUzMywiZXhwIjoxNzU1MTU0OTMzfQ.a1X0eZHpJeGGtMzZueTd7T5YbHhG5UJNo8pswFuyhmY",
+								"type": "text"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n    \"receiver\":\"68a4749b4a3a04584de564c4\",\r\n    \"pickupAddress\":\"Natore\",\r\n    \"deliveryAddress\":\"Barisal\",\r\n    \"type\":\"Document\",\r\n    \"weight\":2,\r\n    \"details\":\"A4 size original certificate\",\r\n    \"deliveryDate\":\"21/8/2025\"\r\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{baseUrl}}/api/v1/parcel/create",
+							
+							"host": [
+								"{{baseUrl}}"
+							],
+							
+							"path": [
+								"api",
+								"v1",
+								"parcel",
+								"create"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Get All Parcel",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{baseUrl}}/api/v1/parcel?fields=-trackingId,-currentStatus &sort=deliveryDate",
+							
+							"host": [
+								"{{baseUrl}}"
+							],
+							
+							"path": [
+								"api",
+								"v1",
+								"parcel"
+							],
+							"query": [
+								{
+									"key": "type",
+									"value": "Medicine",
+									"disabled": true
+								},
+								{
+									"key": "searchTerm",
+									"value": "jessore",
+									"disabled": true
+								},
+								{
+									"key": "fields",
+									"value": "-trackingId,-currentStatus "
+								},
+								{
+									"key": "sort",
+									"value": "deliveryDate"
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Get Single Parcel",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{baseUrl}}/api/v1/parcel/68a4e1de57de59b2943030f7",
+							
+							"host": [
+								"{{baseUrl}}"
+							],
+							
+							"path": [
+								"api",
+								"v1",
+								"parcel",
+								"68a4e1de57de59b2943030f7"
+							],
+							"query": [
+								{
+									"key": "type",
+									"value": "Medicine",
+									"disabled": true
+								},
+								{
+									"key": "searchTerm",
+									"value": "jessore",
+									"disabled": true
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Get Sender Parcel",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{baseUrl}}/api/v1/parcel/sender/68a694a5b5cf4fd7b8e623c5",
+							
+							"host": [
+								"{{baseUrl}}"
+							],
+							
+							"path": [
+								"api",
+								"v1",
+								"parcel",
+								"sender",
+								"68a694a5b5cf4fd7b8e623c5"
+							],
+							"query": [
+								{
+									"key": "sort",
+									"value": "deliveryDate",
+									"disabled": true
+								},
+								{
+									"key": "searchTerm",
+									"value": "",
+									"disabled": true
+								},
+								{
+									"key": "fields",
+									"value": "type,details,fee",
+									"disabled": true
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Receiver All Parcels",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{baseUrl}}/api/v1/parcel/receiver/68a475524a3a04584de564d0?searchTerm=laptop",
+							
+							"host": [
+								"{{baseUrl}}"
+							],
+							
+							"path": [
+								"api",
+								"v1",
+								"parcel",
+								"receiver",
+								"68a475524a3a04584de564d0"
+							],
+							"query": [
+								{
+									"key": "searchTerm",
+									"value": "laptop"
+								},
+								{
+									"key": "fields",
+									"value": "type",
+									"disabled": true
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Receiver Delivered Parcels",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{baseUrl}}/api/v1/parcel/receiver/68a475524a3a04584de564d0/delivered",
+							
+							"host": [
+								"{{baseUrl}}"
+							],
+							
+							"path": [
+								"api",
+								"v1",
+								"parcel",
+								"receiver",
+								"68a475524a3a04584de564d0",
+								"delivered"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Receiver Upcoming Parcels",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{baseUrl}}/api/v1/parcel/receiver/68a475524a3a04584de564d0/upcoming",
+							
+							"host": [
+								"{{baseUrl}}"
+							],
+							
+							"path": [
+								"api",
+								"v1",
+								"parcel",
+								"receiver",
+								"68a475524a3a04584de564d0",
+								"upcoming"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Parcel History",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{baseUrl}}/api/v1/parcel/TRK-20250820-101010/history",
+							
+							"host": [
+								"{{baseUrl}}"
+							],
+							
+							"path": [
+								"api",
+								"v1",
+								"parcel",
+								"TRK-20250820-101010",
+								"history"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Update Parcel Status",
+					"request": {
+						"method": "PATCH",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n    \"status\": \"DELIVERED\",\r\n  \"location\": \"BBaria\",\r\n  \"notes\": \"parcel is DEVIVERED\",\r\n  \"updatedBy\": \"68a474574a3a04584de564bc\"\r\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{baseUrl}}/api/v1/parcel/68a4e1de57de59b2943030f2/update",
+							
+							"host": [
+								"{{baseUrl}}"
+							],
+							
+							"path": [
+								"api",
+								"v1",
+								"parcel",
+								"68a4e1de57de59b2943030f2",
+								"update"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Cancel Parcel",
+					"request": {
+						"method": "PATCH",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n\"status\": \"CANCELLED\",\r\n  \"location\": \"Rajshahi\",\r\n  \"notes\": \"parcel is approved\",\r\n  \"updatedBy\": \"68a474574a3a04584de564bc\"\r\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{baseUrl}}/api/v1/parcel/68a4cc7198d51ccdaae97fd8/cancel",
+							
+							"host": [
+								"{{baseUrl}}"
+							],
+							
+							"path": [
+								"api",
+								"v1",
+								"parcel",
+								"68a4cc7198d51ccdaae97fd8",
+								"cancel"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Delivered Parcel",
+					"request": {
+						"method": "PATCH",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n\"status\": \"DELIVERED\",\r\n  \"location\": \"Rajshahi\",\r\n  \"notes\": \"parcel is approved\",\r\n  \"updatedBy\": \"68a4749b4a3a04584de564c4\"\r\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{baseUrl}}/api/v1/parcel/68a4cc7198d51ccdaae97fd8/deliver",
+							
+							"host": [
+								"{{baseUrl}}"
+							],
+							
+							"path": [
+								"api",
+								"v1",
+								"parcel",
+								"68a4cc7198d51ccdaae97fd8",
+								"deliver"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Block Parcel",
+					"request": {
+						"method": "PATCH",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n    \"status\": \"APPROVEDf\",\r\n  \"location\": \"Rajshahi\",\r\n  \"notes\": \"parcel is approved\",\r\n  \"updatedBy\": \"68a21adc1c255b4a45037d4a\"\r\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{baseUrl}}/api/v1/parcel/68a4cc7198d51ccdaae97fd8/block",
+							
+							"host": [
+								"{{baseUrl}}"
+							],
+							
+							"path": [
+								"api",
+								"v1",
+								"parcel",
+								"68a4cc7198d51ccdaae97fd8",
+								"block"
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		}
+	]
+}

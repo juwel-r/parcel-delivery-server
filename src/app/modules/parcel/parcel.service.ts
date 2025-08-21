@@ -8,7 +8,6 @@ import AppError from "../../errorHelpers/AppError";
 import httStatus from "http-status-codes";
 import { User } from "../user/user.model";
 import { searchableFields } from "./parcel.constant";
-import { excludeFields } from "../../utils/global.constant";
 import { QueryBuilder } from "../../utils/queryBuilder";
 
 const createParcel = async (req: Request) => {

@@ -7,7 +7,6 @@ import { User } from "./user.model";
 import { IUser } from "./user.interface";
 import { createTokens } from "../../utils/jwt/userTokens";
 import { setTokenToCookie } from "../../utils/jwt/setTokenToCookie";
-import AppError from "../../errorHelpers/AppError";
 import { JwtPayload } from "jsonwebtoken";
 
 const createUser = catchAsync(

@@ -17,7 +17,7 @@ router.get("/",checkAuth(Role.ADMIN), UserController.getAllUser);
 
 router.get("/:id",checkAuth(...Object.values(Role)), UserController.getSingleUser);
 
-router.patch('/:id/role', checkAuth(Role.RECEIVER, Role.SENDER), UserController.swapRole)
+router.patch("/:id/role", checkAuth(Role.RECEIVER, Role.SENDER), UserController.swapRole)
 
 router.patch("/:id",checkAuth(...Object.values(Role)), zodValidation(updateUserZodSchema),  UserController.updateUser);
 

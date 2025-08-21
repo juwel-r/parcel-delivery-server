@@ -7,7 +7,7 @@ import { updateStatusLog } from "./parcel.validation";
 
 const router = Router();
 
-router.post("/create",checkAuth(...Object.values(Role)), ParcelController.createParcel);
+router.post('/create',checkAuth(...Object.values(Role)), ParcelController.createParcel);
 router.get('/', checkAuth(Role.ADMIN), ParcelController.getAllParcel)
 router.get('/:id', checkAuth(...Object.values(Role)), ParcelController.getSingleParcel)
 router.get('/sender/:id', checkAuth(...Object.values(Role)), ParcelController.senderAllParcel)
