@@ -3,10 +3,15 @@ import { router } from "./app/router";
 import { globalError } from "./app/middlewares/globalErrorHandler";
 import { routeNotFound } from "./app/middlewares/routeNotFount";
 import cookieParser from 'cookie-parser'
+import cors from 'cors';
 
 const app = express();
 app.use(express.json())
 app.use(cookieParser())
+app.use(cors({
+  origin:"http://localhost:3000",
+  credentials:true
+}))
 
 app.use("/api/v1", router);
 
