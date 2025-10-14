@@ -13,14 +13,33 @@ router.post(
   UserController.createUser
 );
 
-router.get("/",checkAuth(Role.ADMIN), UserController.getAllUser);
+router.get("/", checkAuth(Role.ADMIN), UserController.getAllUser);
 
-router.get("/:id",checkAuth(...Object.values(Role)), UserController.getSingleUser);
+router.get("/me", checkAuth(...Object.values(Role)), UserController.getMe);
 
-router.patch("/:id/role", checkAuth(Role.RECEIVER, Role.SENDER), UserController.swapRole)
+router.get(
+  "/:id",
+  checkAuth(...Object.values(Role)),
+  UserController.getSingleUser
+);
 
-router.patch("/:id",checkAuth(...Object.values(Role)), zodValidation(updateUserZodSchema),  UserController.updateUser);
+router.patch(
+  "/:id/role",
+  checkAuth(Role.RECEIVER, Role.SENDER),
+  UserController.swapRole
+);
 
-router.delete("/:id",checkAuth(...Object.values(Role)), UserController.deleteUser);
+router.patch(
+  "/:id",
+  checkAuth(...Object.values(Role)),
+  zodValidation(updateUserZodSchema),
+  UserController.updateUser
+);
+
+router.delete(
+  "/:id",
+  checkAuth(...Object.values(Role)),
+  UserController.deleteUser
+);
 
 export const UserRoutes = router;

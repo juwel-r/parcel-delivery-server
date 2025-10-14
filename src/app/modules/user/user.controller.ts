@@ -28,7 +28,23 @@ const getAllUser = catchAsync(
     const result = await UserServices.getAllUser( req.query as Record<string, string>);
 
     sendResponse(res, {
-      statusCode: 201,
+      statusCode: 200,
+      success: true,
+      message: "All user retrieved successfully",
+      data: result,
+    });
+  }
+);
+
+const getMe = catchAsync(
+  async (req: Request, res: Response, next: NextFunction) => {
+    const verifiedToken = req.user;
+    console.log({verifiedToken});
+    const id = verifiedToken.userId
+    const result = await UserServices.getMe(id);
+
+    sendResponse(res, {
+      statusCode: 200,
       success: true,
       message: "All user retrieved successfully",
       data: result,
@@ -42,7 +58,7 @@ const getSingleUser = catchAsync(
     const result = await UserServices.getSingleUser(id);
 
     sendResponse(res, {
-      statusCode: 201,
+      statusCode: 200,
       success: true,
       message: "All user retrieved successfully",
       data: result,
@@ -102,6 +118,7 @@ const deleteUser = catchAsync(
 export const UserController = {
   createUser,
   getAllUser,
+  getMe,
   getSingleUser,
   updateUser,
   swapRole,

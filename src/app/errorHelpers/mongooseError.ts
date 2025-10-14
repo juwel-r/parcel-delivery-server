@@ -2,7 +2,7 @@ export const handleDuplicateError = (error: any) => {
   const message =
     error.message.match(/"([^"]+)"/)[1] + " - is already registered.";
   return {
-    StatusCode: 400,
+    StatusCode: 409,
     message: message,
   };
 };

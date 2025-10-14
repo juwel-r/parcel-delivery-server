@@ -57,6 +57,11 @@ const getAllUser = async (query: Record<string, string>) => {
   return result;
 };
 
+const getMe = async (id:string)=>{
+  const result = await User.findById(id);
+  return result
+}
+
 const getSingleUser = async (id: string) => {
   const result = await User.findById(id).select("-password");
   return result;
@@ -154,6 +159,7 @@ const deleteUser = async (id: string) => {
 export const UserServices = {
   createUser,
   getAllUser,
+  getMe,
   getSingleUser,
   updateUser,
   swapRole,
