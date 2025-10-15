@@ -24,8 +24,23 @@ const createUser = catchAsync(
 
 const getAllUser = catchAsync(
   async (req: Request, res: Response, next: NextFunction) => {
+    const result = await UserServices.getAllUser(
+      req.query as Record<string, string>
+    );
 
-    const result = await UserServices.getAllUser( req.query as Record<string, string>);
+    sendResponse(res, {
+      statusCode: 200,
+      success: true,
+      message: "All user retrieved successfully",
+      data: result,
+    });
+  }
+);
+
+const getReceivers = catchAsync(
+  async (req: Request, res: Response, next: NextFunction) => {
+
+    const result = await UserServices.getReceivers();
 
     sendResponse(res, {
       statusCode: 200,
@@ -39,8 +54,8 @@ const getAllUser = catchAsync(
 const getMe = catchAsync(
   async (req: Request, res: Response, next: NextFunction) => {
     const verifiedToken = req.user;
-    console.log({verifiedToken});
-    const id = verifiedToken.userId
+    const id = verifiedToken.userId;
+
     const result = await UserServices.getMe(id);
 
     sendResponse(res, {
@@ -51,6 +66,7 @@ const getMe = catchAsync(
     });
   }
 );
+
 
 const getSingleUser = catchAsync(
   async (req: Request, res: Response, next: NextFunction) => {
@@ -70,7 +86,11 @@ const updateUser = catchAsync(
   async (req: Request, res: Response, next: NextFunction) => {
     const { id } = req.params;
 
-    const result = await UserServices.updateUser(id, req.body, req.user as JwtPayload);
+    const result = await UserServices.updateUser(
+      id,
+      req.body,
+      req.user as JwtPayload
+    );
 
     sendResponse(res, {
       statusCode: 201,
@@ -118,9 +138,10 @@ const deleteUser = catchAsync(
 export const UserController = {
   createUser,
   getAllUser,
+  getReceivers,
   getMe,
   getSingleUser,
   updateUser,
   swapRole,
-  deleteUser
+  deleteUser,
 };

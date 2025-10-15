@@ -48,6 +48,21 @@ const getSingleParcel = catchAsync(
   }
 );
 
+
+const myAllParcel = catchAsync(
+  async (req: Request, res: Response, Next: NextFunction) => {
+    const verifiedToken = req.user
+    const result = await ParcelService.myAllParcel(verifiedToken.userId, req.query as Record<string,string>);
+
+    sendResponse(res, {
+      success: true,
+      statusCode: httpStatus.OK,
+      message: "My parcels are retrieved successfully",
+      data: result,
+    });
+  }
+);
+
 const senderAllParcel = catchAsync(
   async (req: Request, res: Response, Next: NextFunction) => {
     const { id } = req.params;
@@ -182,6 +197,7 @@ const blockParcel = catchAsync(
 export const ParcelController = {
   createParcel,
   getAllParcel,
+  myAllParcel,
   senderAllParcel,
   receiverAllParcel,
   receiverDeliveredParcel,

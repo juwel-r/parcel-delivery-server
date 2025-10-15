@@ -3,13 +3,12 @@ import { ParcelStatus } from "./parcel.interface";
 
 export const parcelZodSchema = z.object({
   receiver:z.string(),
+  weight: z.number().positive({error:"Weight must be positive number."}).optional(),
+  type: z.string(),
   pickupAddress: z.string(),
   deliveryAddress: z.string(),
-  type: z.string(),
-  details: z.string().optional(),
-  weight: z.number().optional(),
   deliveryDate:z.string(),
-  currentStatus: z.enum(Object.values(ParcelStatus)),
+  details: z.string().optional(),
 });
 
 export const updateStatusLog = z.object({

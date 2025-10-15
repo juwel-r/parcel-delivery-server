@@ -3,13 +3,13 @@ import { ParcelController } from "./parcel.controller";
 import { checkAuth } from "../../middlewares/checkAuth";
 import { Role } from "../user/user.interface";
 import { zodValidation } from "../../middlewares/zodValidation";
-import { updateStatusLog } from "./parcel.validation";
+import { parcelZodSchema, updateStatusLog } from "./parcel.validation";
 
 const router = Router();
 
-router.post('/create',checkAuth(...Object.values(Role)), ParcelController.createParcel);
+router.post('/create',checkAuth(...Object.values(Role)),zodValidation(parcelZodSchema), ParcelController.createParcel);
 router.get('/', checkAuth(Role.ADMIN), ParcelController.getAllParcel)
-router.get('/:id', checkAuth(...Object.values(Role)), ParcelController.getSingleParcel)
+router.get('/my-parcels', checkAuth(...Object.values(Role)), ParcelController.myAllParcel)
 router.get('/sender/:id', checkAuth(...Object.values(Role)), ParcelController.senderAllParcel)
 router.get('/receiver/:id', checkAuth(...Object.values(Role)), ParcelController.receiverAllParcel)
 router.get('/receiver/:id/delivered', checkAuth(...Object.values(Role)), ParcelController.receiverDeliveredParcel)
@@ -19,6 +19,7 @@ router.patch('/:id/update',checkAuth(Role.ADMIN), zodValidation(updateStatusLog)
 router.patch('/:id/cancel',checkAuth(Role.SENDER, Role.RECEIVER), zodValidation(updateStatusLog), ParcelController.cancelParcel)
 router.patch('/:id/deliver',checkAuth(Role.RECEIVER, Role.SENDER), zodValidation(updateStatusLog), ParcelController.deliverParcel)
 router.patch('/:id/block',checkAuth(Role.ADMIN),  ParcelController.blockParcel)
+router.get('/:id', checkAuth(...Object.values(Role)), ParcelController.getSingleParcel)
 
 
 export const ParcelRouter = router;

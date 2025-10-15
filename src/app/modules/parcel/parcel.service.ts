@@ -80,6 +80,24 @@ const getSingleParcel = async (id: string) => {
   return result;
 };
 
+const myAllParcel = async (id: string, query:Record<string, string>) => {
+  const isSenderExist = await User.findById(id);
+
+  if (!isSenderExist) {
+    throw new AppError(httStatus.NOT_FOUND, "Parcel sender is not exist.");
+  }
+  const queryBuilder = new QueryBuilder(Parcel.find({sender:id}), query);
+
+  const result = await queryBuilder
+    .filter()
+    .search(searchableFields)
+    .fields()
+    .sort()
+    .build();
+
+  return result;
+};
+
 const senderAllParcel = async (id: string, query:Record<string, string>) => {
   const isSenderExist = await User.findById(id);
 
@@ -342,6 +360,7 @@ const blockParcel = async (parcelId: string) => {
 export const ParcelService = {
   createParcel,
   getAllParcel,
+  myAllParcel,
   senderAllParcel,
   receiverAllParcel,
   receiverDeliveredParcel,

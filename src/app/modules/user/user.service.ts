@@ -57,40 +57,48 @@ const getAllUser = async (query: Record<string, string>) => {
   return result;
 };
 
-const getMe = async (id:string)=>{
+const getReceivers = async () => {
+  const result = await User.find({ role: Role.RECEIVER }).select("_id name");
+  return result;
+};
+
+const getMe = async (id: string) => {
   const result = await User.findById(id);
-  return result
-}
+  return result;
+};
 
 const getSingleUser = async (id: string) => {
   const result = await User.findById(id).select("-password");
   return result;
 };
 
-const updateUser = async (id: string, payload: Partial<IUser>, updater:JwtPayload) => {
+const updateUser = async (
+  id: string,
+  payload: Partial<IUser>,
+  updater: JwtPayload
+) => {
   const user = await User.findById(id);
 
   if (!user) {
     throw new AppError(404, "No user found to update.");
   }
 
-  if ((user!.isActive === IsActive.BLOCK && !payload.isActive) || user!.isDeleted) {
-    throw new AppError(
-      httpStatus.FORBIDDEN,
-      "User is blocked or deleted."
-    );
+  if (
+    (user!.isActive === IsActive.BLOCK && !payload.isActive) ||
+    user!.isDeleted
+  ) {
+    throw new AppError(httpStatus.FORBIDDEN, "User is blocked or deleted.");
   }
 
   if (payload.role) {
-
-    if (updater.role !== Role.ADMIN ) {
+    if (updater.role !== Role.ADMIN) {
       throw new AppError(
         httpStatus.FORBIDDEN,
         "You are not permitted to update Role"
       );
     }
 
-    if (updater.userId === id ) {
+    if (updater.userId === id) {
       throw new AppError(
         httpStatus.FORBIDDEN,
         "You can't update your own role."
@@ -159,9 +167,10 @@ const deleteUser = async (id: string) => {
 export const UserServices = {
   createUser,
   getAllUser,
+  getReceivers,
   getMe,
   getSingleUser,
   updateUser,
   swapRole,
-  deleteUser
+  deleteUser,
 };
