@@ -58,7 +58,8 @@ const myAllParcel = catchAsync(
       success: true,
       statusCode: httpStatus.OK,
       message: "My parcels are retrieved successfully",
-      data: result,
+      data: result.result,
+      meta: result.meta
     });
   }
 );
@@ -122,8 +123,11 @@ const receiverUpcomingParcel = catchAsync(
 const updateParcelStatus = catchAsync(
   async (req: Request, res: Response, Next: NextFunction) => {
     const { id } = req.params;
+    const payload=req.body;
+    const verifiedToken = req.user
+    payload.updatedBy= verifiedToken.userId
 
-    const result = await ParcelService.updateParcelStatus(id, req.body);
+    const result = await ParcelService.updateParcelStatus(id, payload);
 
     sendResponse(res, {
       success: true,

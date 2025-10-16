@@ -69,6 +69,7 @@ const getAllParcel = async (query: Record<string, string>) => {
     .search(searchableFields)
     .fields()
     .sort()
+    .populate("receiver sender", "_id name")
     .build();
 
   return result;
@@ -80,25 +81,28 @@ const getSingleParcel = async (id: string) => {
   return result;
 };
 
-const myAllParcel = async (id: string, query:Record<string, string>) => {
+const myAllParcel = async (id: string, query: Record<string, string>) => {
   const isSenderExist = await User.findById(id);
 
   if (!isSenderExist) {
     throw new AppError(httStatus.NOT_FOUND, "Parcel sender is not exist.");
   }
-  const queryBuilder = new QueryBuilder(Parcel.find({sender:id}), query);
+  const queryBuilder = new QueryBuilder(Parcel.find({ sender: id }), query);
 
   const result = await queryBuilder
     .filter()
     .search(searchableFields)
     .fields()
     .sort()
+    .populate("receiver", "_id name")
     .build();
 
-  return result;
+  const meta = await queryBuilder.getMeta();
+
+  return { result, meta };
 };
 
-const senderAllParcel = async (id: string, query:Record<string, string>) => {
+const senderAllParcel = async (id: string, query: Record<string, string>) => {
   const isSenderExist = await User.findById(id);
 
   if (!isSenderExist) {
@@ -109,6 +113,7 @@ const senderAllParcel = async (id: string, query:Record<string, string>) => {
   const result = await queryBuilder
     .filter()
     .search(searchableFields)
+    .populate("receiver sender", "_id name")
     .fields()
     .sort()
     .build();
@@ -116,7 +121,7 @@ const senderAllParcel = async (id: string, query:Record<string, string>) => {
   return result;
 };
 
-const receiverAllParcel = async (id: string, query:Record<string, string>) => {
+const receiverAllParcel = async (id: string, query: Record<string, string>) => {
   const isReceiverExist = await User.findById(id);
 
   if (!isReceiverExist) {
@@ -129,6 +134,7 @@ const receiverAllParcel = async (id: string, query:Record<string, string>) => {
     .search(searchableFields)
     .fields()
     .sort()
+    .populate("receiver sender","_id name")
     .build();
 
   return result;

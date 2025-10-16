@@ -50,6 +50,25 @@ export class QueryBuilder<T> {
     return this
   }
 
+    async getMeta() {
+    const totalDocument = await this.modelQuery.model.countDocuments();
+    const page = Number(this.query.page) || 1;
+    const limit = Number(this.query.limit) || 5;
+    const totalPage = Math.ceil(totalDocument / limit);
+
+    return {
+      page,
+      limit,
+      totalPage,
+      total: totalDocument,
+    }
+  }
+
+    populate(fieldNames:string, fields:string):this{
+    this.modelQuery = this.modelQuery.populate(fieldNames, fields)
+    return this
+  }
+
     build() {
     return this.modelQuery;
   }
