@@ -11,7 +11,7 @@ export enum ParcelStatus {
 
 export interface StatusLog {
   status: ParcelStatus;
-  location: string;
+  location?: string;
   notes?: string;
   updatedBy: Types.ObjectId;
   timestamp?: Date;

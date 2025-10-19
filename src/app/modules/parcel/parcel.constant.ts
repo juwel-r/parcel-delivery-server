@@ -4,5 +4,5 @@ export const searchableFields = [
   "deliveryDate",
   "type",
   "details",
-  "currentStatus"
+  "currentStatus",
 ];

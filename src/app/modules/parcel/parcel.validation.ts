@@ -15,5 +15,4 @@ export const updateStatusLog = z.object({
   status: z.enum(Object.values(ParcelStatus)),
   location: z.string(),
   notes: z.string().optional(),
-  updatedBy:z.string(),
 });

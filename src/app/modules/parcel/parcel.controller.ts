@@ -28,7 +28,8 @@ const getAllParcel = catchAsync(
       success: true,
       statusCode: httpStatus.OK,
       message: "All parcels retrieved successfully",
-      data: result,
+      data: result.data,
+      meta:result.meta
     });
   }
 );
@@ -94,8 +95,8 @@ const receiverAllParcel = catchAsync(
 
 const receiverDeliveredParcel = catchAsync(
   async (req: Request, res: Response, Next: NextFunction) => {
-    const { id } = req.params;
-    const result = await ParcelService.receiverDeliveredParcel(id);
+
+    const result = await ParcelService.receiverDeliveredParcel(req.user.userId);
 
     sendResponse(res, {
       success: true,
@@ -108,8 +109,8 @@ const receiverDeliveredParcel = catchAsync(
 
 const receiverUpcomingParcel = catchAsync(
   async (req: Request, res: Response, Next: NextFunction) => {
-    const { id } = req.params;
-    const result = await ParcelService.receiverUpcomingParcel(id);
+    const verifiedToken = req.user
+    const result = await ParcelService.receiverUpcomingParcel(verifiedToken.userId);
 
     sendResponse(res, {
       success: true,
@@ -141,8 +142,7 @@ const updateParcelStatus = catchAsync(
 const cancelParcel = catchAsync(
   async (req: Request, res: Response, Next: NextFunction) => {
     const { id } = req.params;
-
-    const result = await ParcelService.cancelParcel(id, req.body);
+    const result = await ParcelService.cancelParcel(id, req.user.userId);
 
     sendResponse(res, {
       success: true,
@@ -153,11 +153,11 @@ const cancelParcel = catchAsync(
   }
 );
 
-const deliverParcel = catchAsync(
+const confirmDelivery = catchAsync(
   async (req: Request, res: Response, Next: NextFunction) => {
     const { id } = req.params;
 
-    const result = await ParcelService.deliverParcel(id, req.body);
+    const result = await ParcelService.confirmDelivery(id, req.user.userId);
 
     sendResponse(res, {
       success: true,
@@ -208,7 +208,7 @@ export const ParcelController = {
   receiverUpcomingParcel,
   updateParcelStatus,
   cancelParcel,
-  deliverParcel,
+  confirmDelivery,
   deliveryHistory,
   blockParcel,
   getSingleParcel,

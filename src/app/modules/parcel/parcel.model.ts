@@ -4,7 +4,7 @@ import { IParcel, ParcelStatus, StatusLog } from "./parcel.interface";
 const statusLogSchema = new Schema<StatusLog>(
   {
     status: { type: String, enum: Object.values(ParcelStatus), required: true },
-    location: { type: String, required: true },
+    location: { type: String },
     notes: { type: String },
     updatedBy: { type: Schema.Types.ObjectId, ref: "User", required: true },
     timestamp: { type: Date, default: Date.now },

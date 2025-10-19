@@ -9,6 +9,7 @@ import httStatus from "http-status-codes";
 import { User } from "../user/user.model";
 import { searchableFields } from "./parcel.constant";
 import { QueryBuilder } from "../../utils/queryBuilder";
+import { Types } from "mongoose";
 
 const createParcel = async (req: Request) => {
   const payload: Partial<IParcel> = req.body;
@@ -63,16 +64,25 @@ const createParcel = async (req: Request) => {
 
 const getAllParcel = async (query: Record<string, string>) => {
   const queryBuilder = new QueryBuilder(Parcel.find(), query);
-
-  const result = await queryBuilder
+console.log(query);
+  const result =  queryBuilder
     .filter()
     .search(searchableFields)
     .fields()
     .sort()
     .populate("receiver sender", "_id name")
-    .build();
+    .paginate()
 
-  return result;
+        const [data, meta] = await Promise.all([
+        result.build(),
+        queryBuilder.getMeta()
+    ])
+
+    return {
+        data,
+        meta
+    }
+
 };
 
 const getSingleParcel = async (id: string) => {
@@ -95,6 +105,7 @@ const myAllParcel = async (id: string, query: Record<string, string>) => {
     .fields()
     .sort()
     .populate("receiver", "_id name")
+    .paginate()
     .build();
 
   const meta = await queryBuilder.getMeta();
@@ -134,7 +145,7 @@ const receiverAllParcel = async (id: string, query: Record<string, string>) => {
     .search(searchableFields)
     .fields()
     .sort()
-    .populate("receiver sender","_id name")
+    .populate("sender", "_id name")
     .build();
 
   return result;
@@ -150,7 +161,7 @@ const receiverDeliveredParcel = async (id: string) => {
   const result = await Parcel.find({
     receiver: id,
     currentStatus: { $eq: ParcelStatus.DELIVERED },
-  });
+  }).populate("sender","name");
 
   return result;
 };
@@ -165,7 +176,7 @@ const receiverUpcomingParcel = async (id: string) => {
   const result = await Parcel.find({
     receiver: id,
     currentStatus: { $nin: [ParcelStatus.DELIVERED, ParcelStatus.CANCELLED] },
-  });
+  }).populate("sender", "_id name");
 
   return result;
 };
@@ -248,14 +259,14 @@ const updateParcelStatus = async (parcelId: string, payload: StatusLog) => {
   return result;
 };
 
-const cancelParcel = async (parcelId: string, payload: StatusLog) => {
+const cancelParcel = async (parcelId: string, updatedBy: Types.ObjectId) => {
   const parcel = await Parcel.findById(parcelId);
 
   if (!parcel) {
     throw new AppError(404, "No parcel found to update status.");
   }
 
-  if (!parcel.sender.equals(payload.updatedBy)) {
+  if (!parcel.sender.equals(updatedBy)) {
     throw new AppError(
       httStatus.UNAUTHORIZED,
       "You are not owner of this parcel."
@@ -269,12 +280,12 @@ const cancelParcel = async (parcelId: string, payload: StatusLog) => {
     );
   }
 
-  if (payload.status !== ParcelStatus.CANCELLED) {
-    throw new AppError(
-      httStatus.BAD_REQUEST,
-      "You can only CANCEL your parcel from here"
-    );
-  }
+  // if (payload.status !== ParcelStatus.CANCELLED) {
+  //   throw new AppError(
+  //     httStatus.BAD_REQUEST,
+  //     `You are not permitted to ${payload.status}`
+  //   );
+  // }
 
   if (
     parcel.currentStatus !== ParcelStatus.REQUESTED &&
@@ -286,10 +297,16 @@ const cancelParcel = async (parcelId: string, payload: StatusLog) => {
     );
   }
 
+  const payload = {
+    status: ParcelStatus.CANCELLED,
+    location: "",
+    updatedBy,
+  };
+
   const result = await Parcel.findByIdAndUpdate(
     parcelId,
     {
-      $set: { currentStatus: payload.status },
+      $set: { currentStatus: ParcelStatus.CANCELLED },
       $push: { statusLog: payload },
     },
     { new: true, runValidators: true }
@@ -298,14 +315,14 @@ const cancelParcel = async (parcelId: string, payload: StatusLog) => {
   return result;
 };
 
-const deliverParcel = async (parcelId: string, payload: StatusLog) => {
+const confirmDelivery = async (parcelId: string, updatedBy: Types.ObjectId) => {
   const parcel = await Parcel.findById(parcelId);
 
   if (!parcel) {
     throw new AppError(404, "No parcel found to update status.");
   }
 
-  if (!parcel.receiver.equals(payload.updatedBy)) {
+  if (!parcel.receiver.equals(updatedBy)) {
     throw new AppError(
       httStatus.UNAUTHORIZED,
       "You are not receiver of this parcel."
@@ -319,13 +336,6 @@ const deliverParcel = async (parcelId: string, payload: StatusLog) => {
     );
   }
 
-  if (payload.status !== ParcelStatus.DELIVERED) {
-    throw new AppError(
-      httStatus.BAD_REQUEST,
-      "You can only update status as DELIVERED"
-    );
-  }
-
   if (parcel.currentStatus !== ParcelStatus.IN_TRANSIT) {
     throw new AppError(
       httStatus.BAD_REQUEST,
@@ -333,10 +343,15 @@ const deliverParcel = async (parcelId: string, payload: StatusLog) => {
     );
   }
 
+  const payload = {
+    status: ParcelStatus.CANCELLED,
+    location: "",
+    updatedBy,
+  };
   const result = await Parcel.findByIdAndUpdate(
     parcelId,
     {
-      $set: { currentStatus: payload.status },
+      $set: { currentStatus: ParcelStatus.DELIVERED },
       $push: { statusLog: payload },
     },
     { new: true, runValidators: true }
@@ -372,7 +387,7 @@ export const ParcelService = {
   receiverDeliveredParcel,
   updateParcelStatus,
   cancelParcel,
-  deliverParcel,
+  confirmDelivery,
   deliveryHistory,
   blockParcel,
   getSingleParcel,

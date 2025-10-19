@@ -47,14 +47,17 @@ const getAllUser = async (query: Record<string, string>) => {
     .search(searchableFields)
     .fields()
     .sort()
+    .paginate()
     .build();
 
-  // const result = await User.find({}).select("-password");
+    
 
+  const meta = await queryBuilder.getMeta();
   if (!result) {
     throw new AppError(404, "User not found.");
   }
-  return result;
+  return { result, meta };
+
 };
 
 const getReceivers = async () => {
@@ -97,13 +100,9 @@ const updateUser = async (
         "You are not permitted to update Role"
       );
     }
-
-    if (updater.userId === id) {
-      throw new AppError(
-        httpStatus.FORBIDDEN,
-        "You can't update your own role."
-      );
-    }
+  }
+  if (updater.userId === id) {
+    throw new AppError(httpStatus.FORBIDDEN, "You can't update your own role.");
   }
 
   if (
@@ -122,12 +121,12 @@ const updateUser = async (
       "Update information except password."
     );
   }
+  console.log(payload);
 
   const updateUser = await User.findByIdAndUpdate(user!._id, payload, {
     new: true,
     runValidators: true,
   });
-  console.log(payload.phone);
   return updateUser;
 };
 

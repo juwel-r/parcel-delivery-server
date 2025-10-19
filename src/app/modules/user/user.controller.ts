@@ -32,7 +32,8 @@ const getAllUser = catchAsync(
       statusCode: 200,
       success: true,
       message: "All user retrieved successfully",
-      data: result,
+      data: result.result,
+      meta:result.meta
     });
   }
 );
