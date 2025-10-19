@@ -5,4 +5,5 @@ export const searchableFields = [
   "type",
   "details",
   "currentStatus",
+  "trackingId"
 ];

@@ -9,6 +9,7 @@ const router = Router();
 
 router.post('/create',checkAuth(...Object.values(Role)),zodValidation(parcelZodSchema), ParcelController.createParcel);
 router.get('/', checkAuth(Role.ADMIN), ParcelController.getAllParcel)
+router.get('/dashboard-overview', checkAuth(Role.ADMIN), ParcelController.getDashboardOverview)
 router.get('/my-parcels', checkAuth(...Object.values(Role)), ParcelController.myAllParcel)
 router.get('/sender/:id', checkAuth(...Object.values(Role)), ParcelController.senderAllParcel)
 router.get('/receiver/upcoming-parcel', checkAuth(...Object.values(Role)), ParcelController.receiverUpcomingParcel)

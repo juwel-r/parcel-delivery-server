@@ -110,13 +110,14 @@ const receiverDeliveredParcel = catchAsync(
 const receiverUpcomingParcel = catchAsync(
   async (req: Request, res: Response, Next: NextFunction) => {
     const verifiedToken = req.user
-    const result = await ParcelService.receiverUpcomingParcel(verifiedToken.userId);
+    const result = await ParcelService.receiverUpcomingParcel(verifiedToken.userId, req.query as Record<string, string>);
 
     sendResponse(res, {
       success: true,
       statusCode: httpStatus.OK,
       message: "All of receiver parcels retrieved successfully",
-      data: result,
+      data: result.data,
+      meta:result.meta
     });
   }
 );
@@ -198,6 +199,22 @@ const blockParcel = catchAsync(
   }
 );
 
+const getDashboardOverview = catchAsync(
+  async (req: Request, res: Response, Next: NextFunction) => {
+
+    const result = await ParcelService.getDashboardOverview();
+
+    sendResponse(res, {
+      success: true,
+      statusCode: httpStatus.CREATED,
+      message: "Overview generated.",
+      data: result,
+    });
+  }
+);
+
+
+
 export const ParcelController = {
   createParcel,
   getAllParcel,
@@ -212,4 +229,5 @@ export const ParcelController = {
   deliveryHistory,
   blockParcel,
   getSingleParcel,
+  getDashboardOverview
 };

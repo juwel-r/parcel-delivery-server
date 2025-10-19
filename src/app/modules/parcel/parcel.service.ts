@@ -64,25 +64,24 @@ const createParcel = async (req: Request) => {
 
 const getAllParcel = async (query: Record<string, string>) => {
   const queryBuilder = new QueryBuilder(Parcel.find(), query);
-console.log(query);
-  const result =  queryBuilder
+
+  const result = queryBuilder
     .filter()
     .search(searchableFields)
     .fields()
     .sort()
     .populate("receiver sender", "_id name")
-    .paginate()
+    .paginate();
 
-        const [data, meta] = await Promise.all([
-        result.build(),
-        queryBuilder.getMeta()
-    ])
+  const [data, meta] = await Promise.all([
+    result.build(),
+    queryBuilder.getMeta(),
+  ]);
 
-    return {
-        data,
-        meta
-    }
-
+  return {
+    data,
+    meta,
+  };
 };
 
 const getSingleParcel = async (id: string) => {
@@ -119,6 +118,7 @@ const senderAllParcel = async (id: string, query: Record<string, string>) => {
   if (!isSenderExist) {
     throw new AppError(httStatus.NOT_FOUND, "Parcel sender is not exist.");
   }
+  query.sender = id;
   const queryBuilder = new QueryBuilder(Parcel.find(), query);
 
   const result = await queryBuilder
@@ -138,6 +138,7 @@ const receiverAllParcel = async (id: string, query: Record<string, string>) => {
   if (!isReceiverExist) {
     throw new AppError(httStatus.NOT_FOUND, "Receiver is not exist.");
   }
+  query.sender = id;
   const queryBuilder = new QueryBuilder(Parcel.find(), query);
 
   const result = await queryBuilder
@@ -161,24 +162,35 @@ const receiverDeliveredParcel = async (id: string) => {
   const result = await Parcel.find({
     receiver: id,
     currentStatus: { $eq: ParcelStatus.DELIVERED },
-  }).populate("sender","name");
+  }).populate("sender", "name");
 
   return result;
 };
 
-const receiverUpcomingParcel = async (id: string) => {
+const receiverUpcomingParcel = async (
+  id: string,
+  query: Record<string, string>
+) => {
   const isReceiverExist = await User.findById(id);
 
   if (!isReceiverExist) {
     throw new AppError(httStatus.NOT_FOUND, "Receiver is not exist.");
   }
+  query.receiver = id;
+  const queryBuilder = new QueryBuilder(Parcel.find(), query);
 
-  const result = await Parcel.find({
-    receiver: id,
-    currentStatus: { $nin: [ParcelStatus.DELIVERED, ParcelStatus.CANCELLED] },
-  }).populate("sender", "_id name");
+  const data = await queryBuilder
+    .filter()
+    .search(searchableFields)
+    .fields()
+    .sort()
+    .populate("receiver sender", "_id name")
+    .paginate()
+    .build();
 
-  return result;
+  const meta = await queryBuilder.getMeta();
+
+  return { data, meta };
 };
 
 const deliveryHistory = async (trackingId: string) => {
@@ -378,6 +390,89 @@ const blockParcel = async (parcelId: string) => {
   return result;
 };
 
+const getDashboardOverview = async () => {
+  // Overview counts
+  const [overview] = await Parcel.aggregate([
+    {
+      $group: {
+        _id: null,
+        totalParcels: { $sum: 1 },
+        delivered: {
+          $sum: { $cond: [{ $eq: ["$currentStatus", "DELIVERED"] }, 1, 0] },
+        },
+        inTransit: {
+          $sum: { $cond: [{ $eq: ["$currentStatus", "IN_TRANSIT"] }, 1, 0] },
+        },
+        pendingOrCancelled: {
+          $sum: {
+            $cond: [
+              {
+                $in: [
+                  "$currentStatus",
+                  ["REQUESTED", "APPROVED", "DISPATCHED", "CANCELLED"],
+                ],
+              },
+              1,
+              0,
+            ],
+          },
+        },
+      },
+    },
+  ]);
+
+  const monthlyShipments = await Parcel.aggregate([
+    {
+      $addFields: {
+        createdAtDate: { $toDate: "$createdAt" },
+      },
+    },
+    {
+      $group: {
+        _id: { $month: "$createdAtDate" },
+        count: { $sum: 1 },
+      },
+    },
+    {
+      $project: {
+        _id: 0,
+        month: "$_id",
+        count: 1,
+      },
+    },
+    { $sort: { month: 1 } },
+  ]);
+
+  const statusDistribution = await Parcel.aggregate([
+    {
+      $group: {
+        _id: "$currentStatus",
+        count: { $sum: 1 },
+      },
+    },
+    {
+      $project: {
+        _id: 0,
+        status: "$_id",
+        count: 1,
+      },
+    },
+  ]);
+
+  return {
+    cards: overview || {
+      totalParcels: 0,
+      delivered: 0,
+      inTransit: 0,
+      pendingOrCancelled: 0,
+    },
+    charts: {
+      monthlyShipments,
+      statusDistribution,
+    },
+  };
+};
+
 export const ParcelService = {
   createParcel,
   getAllParcel,
@@ -392,4 +487,5 @@ export const ParcelService = {
   blockParcel,
   getSingleParcel,
   receiverUpcomingParcel,
+  getDashboardOverview,
 };
