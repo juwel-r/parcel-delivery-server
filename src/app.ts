@@ -6,12 +6,18 @@ import cookieParser from 'cookie-parser'
 import cors from 'cors';
 
 const app = express();
-app.use(express.json())
-app.use(cookieParser())
-app.use(cors({
-  origin:"http://localhost:3000",
-  credentials:true
-}))
+app.use(
+  cors({
+    origin: [
+      "http://localhost:3000",
+      "http://envilo-parcel.surge.sh",
+      "https://envilo-parcel.surge.sh",
+    ],
+    credentials: true,
+  })
+);
+app.use(express.json());
+app.use(cookieParser());
 
 app.use("/api/v1", router);
 

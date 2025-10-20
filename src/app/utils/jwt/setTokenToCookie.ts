@@ -10,6 +10,7 @@ export const setTokenToCookie = (res: Response, token: IToken) => {
     res.cookie("accessToken", token.accessToken, {
       httpOnly: true,
       secure: true,
+      sameSite:"none"
     });
   }
 
@@ -17,6 +18,7 @@ export const setTokenToCookie = (res: Response, token: IToken) => {
     res.cookie("refreshToken", token.refreshToken, {
       httpOnly: true,
       secure: true,
+      sameSite:"none"
     });
   }
 };
