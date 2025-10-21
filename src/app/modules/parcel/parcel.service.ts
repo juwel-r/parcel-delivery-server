@@ -179,14 +179,10 @@ const receiverUpcomingParcel = async (
   query.receiver = id;
   const queryBuilder = new QueryBuilder(Parcel.find(), query);
 
-  const data = await queryBuilder
-    .filter()
-    .search(searchableFields)
-    .fields()
-    .sort()
-    .populate("receiver sender", "_id name")
-    .paginate()
-    .build();
+ const data = await Parcel.find({
+    receiver: id,
+    currentStatus: { $ne: ParcelStatus.DELIVERED },
+  }).populate("sender", "name");
 
   const meta = await queryBuilder.getMeta();
 

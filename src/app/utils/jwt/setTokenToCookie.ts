@@ -10,7 +10,8 @@ export const setTokenToCookie = (res: Response, token: IToken) => {
     res.cookie("accessToken", token.accessToken, {
       httpOnly: true,
       secure: true,
-      sameSite:"none"
+      sameSite:"none",
+      maxAge: 1 * 24 * 60 * 60 * 1000,
     });
   }
 
@@ -18,7 +19,8 @@ export const setTokenToCookie = (res: Response, token: IToken) => {
     res.cookie("refreshToken", token.refreshToken, {
       httpOnly: true,
       secure: true,
-      sameSite:"none"
+      sameSite:"none",
+      maxAge: 30 * 24 * 60 * 60 * 1000,
     });
   }
 };
